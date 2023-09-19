@@ -3,9 +3,10 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtOpenGL import *
 from PyQt5 import *
 from OpenGL.GL import *
+from OpenGL.GLU import *
 from OpenGL.GLUT import *
 
-class MyOpenGLWidget(QGLWidget):
+class MyOpenGLWidget(QOpenGLWidget):
     def __init__(self):
         super().__init__()
 
@@ -99,8 +100,17 @@ class MyMainWindow(QMainWindow):
 
         tab2.setLayout(tab2_layout)
 
+        # Виджет результатами
+        result_layout = QVBoxLayout()
+        res_groupbox = QGroupBox("Выполнение и результаты")
 
+        res_input1 = QLineEdit()
+        res_input1.setFixedSize(750, 200) # надо как-то сделать чтобы он был большим и меня размер при изменении окна
 
+        result_layout.addWidget(res_input1)
+
+        res_groupbox.setLayout(result_layout)
+        setGraph_layout.addWidget(res_groupbox)
 
         # Виджет с настройками графика
         setGraf_widget = QTabWidget()
