@@ -50,11 +50,11 @@ class MyMainWindow(QMainWindow):
         layout.addWidget(opengl_widget)
 
         # Создаем вертикальный контейнер для правой части
-        right_layout = QVBoxLayout()
+        setGraph_layout = QVBoxLayout()
 
         # Виджет с вкладками
         tab_widget = QTabWidget()
-        right_layout.addWidget(tab_widget)
+        setGraph_layout.addWidget(tab_widget)
 
         # Первая вкладка
         tab1 = QWidget()
@@ -67,7 +67,7 @@ class MyMainWindow(QMainWindow):
 
         # Элементы управления настройками
         beg_point = QLabel("Начальная точка")
-        settings_layout.addRow(beg_point,empty)
+        settings_layout.addRow(beg_point, empty)
 
         x_point = QLabel("X")
         x_input = QLineEdit()
@@ -83,38 +83,47 @@ class MyMainWindow(QMainWindow):
 
         settings_layout.addRow(beg_step,begstep_input)
 
+        button = QPushButton("Выполнить")
+        settings_layout.addWidget(button)
+
         tab1.setLayout(settings_layout)
 
-        # Вторая вкладка (результаты)
+        # Вторая вкладка
         tab2 = QWidget()
         tab_widget.addTab(tab2, "2")
 
-        results_layout = QVBoxLayout()
+        tab2_layout = QVBoxLayout()
 
-        # Текстовое поле для вывода результатов
-        results_text = QTextEdit()
-        results_layout.addWidget(results_text)
+        tab2_txt = QLabel("Некст говно")
+        tab2_layout.addWidget(tab2_txt)
 
-        tab2.setLayout(results_layout)
+        tab2.setLayout(tab2_layout)
+
+
+
 
         # Виджет с настройками графика
         setGraf_widget = QTabWidget()
-        right_layout.addWidget(setGraf_widget)
+        setGraph_layout.addWidget(setGraf_widget)
+        setGraph_layout.setSpacing(20)
 
         setGraf = QWidget()
 
-        group_box = QGroupBox("Настройки графика")
-        group_layout = QVBoxLayout()
+        group_box = QGroupBox("Функции и отображение ее графика")
+        group_layout = QFormLayout()
 
-        scale_label = QLabel("Масштаб:")
-        scale_input = QLineEdit()
-        group_layout.addWidget(scale_label)
-        group_layout.addWidget(scale_input)
+        xInter_label = QLabel("X интервал:")
+        xInter_input = QLineEdit()
+        group_layout.addRow(xInter_label, xInter_input)
 
-        axis_label = QLabel("Оси:")
-        axis_input = QLineEdit()
-        group_layout.addWidget(axis_label)
-        group_layout.addWidget(axis_input)
+        yInter_label = QLabel("Y интервал:")
+        yInter_input = QLineEdit()
+        group_layout.addRow(yInter_label, yInter_input)
+
+        combo_box = QComboBox()
+        combo_box.addItem("График 1")
+        combo_box.addItem("График 2")
+        group_layout.addWidget(combo_box)
 
         group_box.setLayout(group_layout)
         setGraf_layout = QVBoxLayout()
@@ -123,15 +132,7 @@ class MyMainWindow(QMainWindow):
 
         setGraf_widget.addTab(setGraf, "График")
 
-        # Кнопка и выпадающий список
-        button = QPushButton("Выполнить")
-        combo_box = QComboBox()
-        combo_box.addItem("Вариант 1")
-        combo_box.addItem("Вариант 2")
-        right_layout.addWidget(combo_box)
-        right_layout.addWidget(button)
-
-        layout.addLayout(right_layout)
+        layout.addLayout(setGraph_layout)
         central_widget.setLayout(layout)
 
 if __name__ == "__main__":
