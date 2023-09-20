@@ -39,23 +39,22 @@ class MyMainWindow(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("Оптимизация многоэкстремальных функций")
-        self.setGeometry(100, 100, 800, 600)
+        self.setGeometry(300, 300, 1500, 800)
 
-        central_widget = QWidget(self)
+        central_widget = QSplitter(self)
         self.setCentralWidget(central_widget)
 
-        layout = QHBoxLayout()
-
-        # Левое окно с графиком из OpenGL
         opengl_widget = MyOpenGLWidget()
-        layout.addWidget(opengl_widget)
+        central_widget.addWidget(opengl_widget)
 
-        # Создаем вертикальный контейнер для правой части
-        setGraph_layout = QVBoxLayout()
+        right_widget = QWidget(self)
+        central_widget.addWidget(right_widget)
+
+        layout = QVBoxLayout()
 
         # Виджет с вкладками
         tab_widget = QTabWidget()
-        setGraph_layout.addWidget(tab_widget)
+        layout.addWidget(tab_widget)
 
         # Первая вкладка
         tab1 = QWidget()
@@ -110,12 +109,12 @@ class MyMainWindow(QMainWindow):
         result_layout.addWidget(res_input1)
 
         res_groupbox.setLayout(result_layout)
-        setGraph_layout.addWidget(res_groupbox)
+        layout.addWidget(res_groupbox)
 
         # Виджет с настройками графика
         setGraf_widget = QTabWidget()
-        setGraph_layout.addWidget(setGraf_widget)
-        setGraph_layout.setSpacing(20)
+        layout.addWidget(setGraf_widget)
+        layout.setSpacing(20)
 
         setGraf = QWidget()
 
@@ -142,8 +141,11 @@ class MyMainWindow(QMainWindow):
 
         setGraf_widget.addTab(setGraf, "График")
 
-        layout.addLayout(setGraph_layout)
+        layout.addLayout(layout)
         central_widget.setLayout(layout)
+
+        right_widget.setLayout(layout)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
