@@ -1,38 +1,117 @@
 import sys
+import numpy as np
 from PyQt5.QtWidgets import *
 from PyQt5.QtOpenGL import *
 from PyQt5 import *
+from PyQt5.QtCore import QTimer
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 
-class MyOpenGLWidget(QOpenGLWidget):
+
+class MyOpenGLWidget(QGLWidget):
     def __init__(self):
         super().__init__()
+        self.rot_x = 0
+        self.rot_y = 0
+        self.rot_z = 0
+        self.zoom = 1.0
+        self.last_x = 0
+        self.last_y = 0
+        self.max_rot_x = 90
+        self.min_rot_x = -90
+        self.max_rot_y = 90
+        self.min_rot_y = -90
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.updateGL)
+        self.timer.start(16)
 
     def initializeGL(self):
         glClearColor(0.0, 0.0, 0.0, 1.0)
+        glEnable(GL_DEPTH_TEST)
 
     def resizeGL(self, w, h):
         glViewport(0, 0, w, h)
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
+        gluPerspective(45, w / h, 0.1, 50.0)
+        glMatrixMode(GL_MODELVIEW)
 
     def paintGL(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-        # Устанавливаем цвет для рисования (красный)
-        glColor3f(1.0, 0.0, 0.0)
+        glLoadIdentity()
+        gluLookAt(5, 5, 10, 0, 0, 0, 0, 0, 5)
+        glTranslatef(0, 0, -5)
 
-        # Рисуем треугольник
-        glBegin(GL_TRIANGLES)
-        glVertex2f(-0.5, -0.5)
-        glVertex2f(0.5, -0.5)
-        glVertex2f(0.0, 0.5)
+        glRotatef(self.rot_x, 1, 0, 0)
+        glRotatef(self.rot_y, 0, 1, 0)
+        glScalef(self.zoom, self.zoom, self.zoom)
+
+        # Отрисовка осей XYZ
+        # Ось X Красный цвет
+        glColor3f(1.0, 0.0, 0.0)
+        glBegin(GL_LINES)
+        glVertex3f(5, 0, 0)
+        glVertex3f(0, 0, 0)
         glEnd()
 
-        # Завершаем рисование
+        # Ось Y Зеленый цвет
+        glColor3f(0.0, 1.0, 0.0)
+        glBegin(GL_LINES)
+        glVertex3f(0, 5, 0)
+        glVertex3f(0, 0, 0)
+        glEnd()
+
+        # Ось Z Синий цвет
+        glColor3f(0.0, 0.0, 1.0)
+        glBegin(GL_LINES)
+        glVertex3f(0, 0, 5)
+        glVertex3f(0, 0, 0)
+        glEnd()
+
+        # Отрисовка сетки в плоскости XY
+        glColor3f(0.5, 0.5, 0.5)
+        glBegin(GL_LINES)
+        for i in np.arange(-5, 6, 1):
+            glVertex3f(i, -5, 0)
+            glVertex3f(i, 5, 0)
+            glVertex3f(-5, i, 0)
+            glVertex3f(5, i, 0)
+        glEnd()
+
+
+        # Отрисовка графика функции Химмельблау
+        glColor3f(0.0, 0.0, 1.0)
+        glBegin(GL_POINTS)
+        for x in np.arange(-5, 5, 0.1):
+            for y in np.arange(-5, 5, 0.1):
+                z = (x ** 2 + y - 11) ** 2 + (x + y ** 2 - 7) ** 2
+                glVertex3f(x, y, z / 100)
+        glEnd()
+
         glFlush()
 
-# Ваш класс MyOpenGLWidget остается без изменений
+    def mousePressEvent(self, event):
+        self.last_x = event.x()
+        self.last_y = event.y()
+
+    def mouseMoveEvent(self, event):
+        dx = event.x() - self.last_x
+        dy = event.y() - self.last_y
+        self.last_x = event.x()
+        self.last_y = event.y()
+
+        self.rot_x += dy
+        self.rot_y += dx
+
+        self.rot_x = max(self.min_rot_x, min(self.max_rot_x, self.rot_x))
+        self.rot_y = max(self.min_rot_y, min(self.max_rot_y, self.rot_y))
+
+    def wheelEvent(self, event):
+        delta = event.angleDelta().y() / 120
+        self.zoom *= 1.1**delta
+
 
 class MyMainWindow(QMainWindow):
     def __init__(self):
