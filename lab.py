@@ -51,27 +51,30 @@ class MyOpenGLWidget(QGLWidget):
         # Отрисовка осей XYZ
         # Ось X Красный цвет
         glColor3f(1.0, 0.0, 0.0)
+        glLineWidth(5.0)
         glBegin(GL_LINES)
-        glVertex3f(5, 0, 0)
-        glVertex3f(0, 0, 0)
+        glVertex3f(0, -5, 0)
+        glVertex3f(-5, -5, 0)
         glEnd()
 
         # Ось Y Зеленый цвет
         glColor3f(0.0, 1.0, 0.0)
         glBegin(GL_LINES)
-        glVertex3f(0, 5, 0)
-        glVertex3f(0, 0, 0)
+        glVertex3f(-5, -5, 0)
+        glVertex3f(-5, 0, 0)
         glEnd()
 
         # Ось Z Синий цвет
         glColor3f(0.0, 0.0, 1.0)
         glBegin(GL_LINES)
-        glVertex3f(0, 0, 5)
+        glVertex3f(-5, -5, 5)
+        glVertex3f(-5, -5, 0)
         glVertex3f(0, 0, 0)
         glEnd()
 
         # Отрисовка сетки в плоскости XY
         glColor3f(0.5, 0.5, 0.5)
+        glLineWidth(1.0)
         glBegin(GL_LINES)
         for i in np.arange(-5, 6, 1):
             glVertex3f(i, -5, 0)
