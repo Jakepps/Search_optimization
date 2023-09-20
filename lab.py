@@ -63,25 +63,36 @@ class MyMainWindow(QMainWindow):
         settings_layout = QFormLayout()
 
         empty = QLabel('\n')
-        settings_layout.setSpacing(20)
+        settings_layout.setSpacing(10)
 
         # Элементы управления настройками
         beg_point = QLabel("Начальная точка")
         settings_layout.addRow(beg_point, empty)
 
         x_point = QLabel("X")
-        x_input = QLineEdit()
+        x_input = QLineEdit("-1")
 
         y_point = QLabel("Y")
-        y_input = QLineEdit()
+        y_input = QLineEdit("-1")
 
         settings_layout.addRow(x_point, x_input)
         settings_layout.addRow(y_point, y_input)
 
         beg_step = QLabel("Начальный шаг")
-        begstep_input = QLineEdit()
+        begstep_input = QLineEdit("0.5")
 
-        settings_layout.addRow(beg_step,begstep_input)
+        settings_layout.addRow(beg_step, begstep_input)
+
+        count_iter = QLabel("Число итераций")
+        countIter_input = QLineEdit("100")
+
+        settings_layout.addRow(count_iter, countIter_input)
+
+
+        delay = QLabel("Задержка")
+        delay_input = QLineEdit("0.5")
+
+        settings_layout.addRow(delay, delay_input)
 
         button = QPushButton("Выполнить")
         settings_layout.addWidget(button)
@@ -103,10 +114,11 @@ class MyMainWindow(QMainWindow):
         result_layout = QVBoxLayout()
         res_groupbox = QGroupBox("Выполнение и результаты")
 
-        res_input1 = QLineEdit()
-        res_input1.setFixedSize(750, 200) # надо как-то сделать чтобы он был большим и меня размер при изменении окна
+        res_input = QLineEdit()
+        res_input.setFixedSize(300, 200) # надо как-то сделать чтобы он был большим и меня размер при изменении окна, хотя похуй, я нашел этому полезное применение
+        res_input.setReadOnly(True)
 
-        result_layout.addWidget(res_input1)
+        result_layout.addWidget(res_input)
 
         res_groupbox.setLayout(result_layout)
         layout.addWidget(res_groupbox)
@@ -121,18 +133,48 @@ class MyMainWindow(QMainWindow):
         group_box = QGroupBox("Функции и отображение ее графика")
         group_layout = QFormLayout()
 
+        graf = QLabel("Функция")
+        combo_box = QComboBox()
+        combo_box.addItem("...")
+        combo_box.addItem("Z = Y")
+        combo_box.addItem("Функиця Химмельблау")
+        combo_box.addItem("Плоскость XY")
+        combo_box.addItem("Функиця Букина")
+        combo_box.addItem("Функиця Розенброкка")
+        combo_box.addItem("Функиця сферы")
+        combo_box.addItem("Функиця Растригина")
+        combo_box.addItem("Функиця для 2й лабы")
+        group_layout.addRow(graf, combo_box)
+
         xInter_label = QLabel("X интервал:")
-        xInter_input = QLineEdit()
+        xInter_input = QLineEdit("(-5;5)")
         group_layout.addRow(xInter_label, xInter_input)
 
         yInter_label = QLabel("Y интервал:")
-        yInter_input = QLineEdit()
+        yInter_input = QLineEdit("(-5;5)")
         group_layout.addRow(yInter_label, yInter_input)
 
-        combo_box = QComboBox()
-        combo_box.addItem("График 1")
-        combo_box.addItem("График 2")
-        group_layout.addWidget(combo_box)
+        zScale = QLabel("Z масштаб:")
+        zScale_input = QLineEdit("1")
+        group_layout.addRow(zScale, zScale_input)
+
+        axes = QLabel("Оси")
+        axes_check = QCheckBox()
+        axes_check.setChecked(True)
+        group_layout.addRow(axes, axes_check)
+
+        axesyInter_label = QLabel("Ось X интервал:")
+        axesyInter_input = QLineEdit("(-5;10)")
+        group_layout.addRow(axesyInter_label, axesyInter_input)
+
+        axesxInter_label = QLabel("Ось Y интервал:")
+        axesxInter_input = QLineEdit("(-5;10)")
+        group_layout.addRow(axesxInter_label, axesxInter_input)
+
+        grid = QLabel("Сетка")
+        grid_check = QCheckBox()
+        grid_check.setChecked(True)
+        group_layout.addRow(grid, grid_check)
 
         group_box.setLayout(group_layout)
         setGraf_layout = QVBoxLayout()
@@ -141,10 +183,12 @@ class MyMainWindow(QMainWindow):
 
         setGraf_widget.addTab(setGraf, "График")
 
+
         layout.addLayout(layout)
         central_widget.setLayout(layout)
 
         right_widget.setLayout(layout)
+
 
 
 if __name__ == "__main__":
