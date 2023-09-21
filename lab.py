@@ -22,6 +22,7 @@ class MyOpenGLWidget(QGLWidget):
         self.min_rot_x = -90
         self.max_rot_y = 90
         self.min_rot_y = -90
+        self.function_choice = "..."
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.updateGL)
         self.timer.start(16)
@@ -85,15 +86,29 @@ class MyOpenGLWidget(QGLWidget):
 
 
         # Отрисовка графика функции Химмельблау
-        glColor3f(0.0, 0.0, 1.0)
-        glBegin(GL_POINTS)
-        for x in np.arange(-5, 5, 0.1):
-            for y in np.arange(-5, 5, 0.1):
-                z = (x ** 2 + y - 11) ** 2 + (x + y ** 2 - 7) ** 2
-                glVertex3f(x, y, z / 100)
-        glEnd()
+        if self.function_choice == "Функция Химмельблау":
+            glColor3f(0.0, 0.0, 1.0)
+            glBegin(GL_POINTS)
+            for x in np.arange(-5, 5, 0.1):
+                for y in np.arange(-5, 5, 0.1):
+                    z = (x ** 2 + y - 11) ** 2 + (x + y ** 2 - 7) ** 2
+                    glVertex3f(x, y, z / 100)
+            glEnd()
+
+        if self.function_choice == "Z = Y":
+            glColor3f(0.0, 0.0, 1.0)
+            glBegin(GL_POINTS)
+            for x in np.arange(0, 5, 0.1):
+                for y in np.arange(0, 5, 0.1):
+                    z = y
+                    glVertex3f(x, y, z)
+            glEnd()
 
         glFlush()
+
+    def setFunctionChoice(self, choice):
+        self.function_choice = choice
+        self.updateGL()
 
     def mousePressEvent(self, event):
         self.last_x = event.x()
@@ -126,8 +141,8 @@ class MyMainWindow(QMainWindow):
         central_widget = QSplitter(self)
         self.setCentralWidget(central_widget)
 
-        opengl_widget = MyOpenGLWidget()
-        central_widget.addWidget(opengl_widget)
+        self.opengl_widget = MyOpenGLWidget()
+        central_widget.addWidget(self.opengl_widget)
 
         right_widget = QWidget(self)
         central_widget.addWidget(right_widget)
@@ -216,17 +231,19 @@ class MyMainWindow(QMainWindow):
         group_layout = QFormLayout()
 
         graf = QLabel("Функция")
-        combo_box = QComboBox()
-        combo_box.addItem("...")
-        combo_box.addItem("Z = Y")
-        combo_box.addItem("Функиця Химмельблау")
-        combo_box.addItem("Плоскость XY")
-        combo_box.addItem("Функиця Букина")
-        combo_box.addItem("Функиця Розенброкка")
-        combo_box.addItem("Функиця сферы")
-        combo_box.addItem("Функиця Растригина")
-        combo_box.addItem("Функиця для 2й лабы")
-        group_layout.addRow(graf, combo_box)
+        self.combo_box = QComboBox()
+        self.combo_box.addItem("...")
+        self.combo_box.addItem("Z = Y")
+        self.combo_box.addItem("Функция Химмельблау")
+        self.combo_box.addItem("Плоскость XY")
+        self.combo_box.addItem("Функция Букина")
+        self.combo_box.addItem("Функция Розенброкка")
+        self.combo_box.addItem("Функция сферы")
+        self.combo_box.addItem("Функция Растригина")
+        self.combo_box.addItem("Функция для 2й лабы")
+        group_layout.addRow(graf, self.combo_box)
+
+        self.combo_box.currentIndexChanged.connect(self.handleComboBoxChange)
 
         xInter_label = QLabel("X интервал:")
         xInter_input = QLineEdit("(-5;5)")
@@ -271,6 +288,9 @@ class MyMainWindow(QMainWindow):
 
         right_widget.setLayout(layout)
 
+    def handleComboBoxChange(self, index):
+        selected_text = self.combo_box.currentText()
+        self.opengl_widget.setFunctionChoice(selected_text)
 
 
 if __name__ == "__main__":
