@@ -8,6 +8,10 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMenuBar, QMenu, QSlider, QVBoxLayout, QWidget, QComboBox
 
 
 class MyOpenGLWidget(QGLWidget):
@@ -115,6 +119,36 @@ class MyOpenGLWidget(QGLWidget):
                     glVertex3f(x, y, z / 100)
             glEnd()
 
+        if self.function_choice == "Функция Розенброкка":
+            glColor3f(0.0, 0.0, 1.0)
+            glBegin(GL_POINTS)
+            for x in np.arange(-5, 5, 0.1):
+                for y in np.arange(-5, 5, 0.1):
+                    z = (1 - x) ** 2 + 100 * (y - x ** 2) ** 2
+                    glVertex3f(x, y, z / 10000)
+            glEnd()
+
+        if self.function_choice == "Функция сферы": #как то не сходится с нигодиным, надо лабу почитать
+            r = 5
+            glColor3f(0.0, 0.0, 1.0)
+            glBegin(GL_POINTS)
+            for x in np.arange(-r, r, 0.1):
+                for y in np.arange(-r, r, 0.1):
+                    z = np.sqrt(r**2 - x**2 - y**2) if x**2 + y**2 <= r**2 else 0
+                    glVertex3f(x, y, z)
+            glEnd()
+
+        if self.function_choice == "Функция Растригина":
+            A = 10
+            glColor3f(0.0, 0.0, 1.0)
+            glBegin(GL_POINTS)
+            for x in np.arange(-5.12, 5.12, 0.1):
+                for y in np.arange(-5.12, 5.12, 0.1):
+                    z = A + x**2 - A * np.cos(2 * np.pi * x) + y**2 - A * np.cos(2 * np.pi * y)
+                    glVertex3f(x, y, z / 10)
+            glEnd()
+
+
         glFlush()
 
     def setFunctionChoice(self, choice):
@@ -141,6 +175,88 @@ class MyOpenGLWidget(QGLWidget):
         delta = event.angleDelta().y() / 120
         self.zoom *= 1.1**delta
 
+# class MyMatplotlibWidget(QWidget):
+#     def __init__(self):
+#         super().__init__()
+
+#         self.rot_x = 0
+#         self.rot_y = 0
+#         self.zoom = 1.0
+#         self.last_x = 0
+#         self.last_y = 0
+#         self.max_rot_x = 90
+#         self.min_rot_x = -90
+#         self.max_rot_y = 90
+#         self.min_rot_y = -90
+#         self.function_choice = "..."
+#         self.divisor = 1.0
+
+#         self.canvas = FigureCanvas(Figure(figsize=(5, 5)))
+#         self.layout = QVBoxLayout()
+#         self.layout.addWidget(self.canvas)
+#         self.setLayout(self.layout)
+
+#         self.ax = self.canvas.figure.add_subplot(111, projection='3d')
+#         self.ax.set_xlabel('X')
+#         self.ax.set_ylabel('Y')
+#         self.ax.set_zlabel('Z')
+
+#         self.timer = QTimer(self)
+#         self.timer.timeout.connect(self.update_plot)
+#         self.timer.start(16)
+
+#     def update_plot(self):
+#         self.ax.clear()
+
+#         self.ax.view_init(elev=self.rot_x, azim=self.rot_y)
+#         self.ax.dist = 5 / self.zoom
+
+#         #if self.function_choice == "Функция Химмельблау":
+#         x = np.arange(-5, 5, 0.1)
+#         y = np.arange(-5, 5, 0.1)
+#         X, Y = np.meshgrid(x, y)
+#         Z = (X**2 + Y - 11)**2 + (X + Y**2 - 7)**2
+#         self.ax.plot_surface(X, Y, Z / 100, cmap='viridis')
+
+#         if self.function_choice == "Z = Y":
+#             x = np.arange(0, 5, 0.1)
+#             y = np.arange(0, 5, 0.1)
+#             X, Y = np.meshgrid(x, y)
+#             Z = Y
+#             self.ax.plot_surface(X, Y, Z / self.divisor, cmap='viridis')
+
+#         if self.function_choice == "Функция Букина":
+#             x = np.arange(-5, 5, 0.1)
+#             y = np.arange(-5, 5, 0.1)
+#             X, Y = np.meshgrid(x, y)
+#             Z = 100 * np.sqrt(np.abs(Y - 0.01 * X**2)) + 0.01 * np.abs(X + 10)
+#             self.ax.plot_surface(X, Y, Z / 100, cmap='viridis')
+
+#         self.canvas.draw()
+
+#     def set_function_choice(self, choice):
+#         self.function_choice = choice
+
+#     def mousePressEvent(self, event):
+#         self.last_x = event.x()
+#         self.last_y = event.y()
+
+#     def mouseMoveEvent(self, event):
+#         dx = event.x() - self.last_x
+#         dy = event.y() - self.last_y
+#         self.last_x = event.x()
+#         self.last_y = event.y()
+
+#         self.rot_x += dy
+#         self.rot_y += dx
+
+#         self.rot_x = max(self.min_rot_x, min(self.max_rot_x, self.rot_x))
+#         self.rot_y = max(self.min_rot_y, min(self.max_rot_y, self.rot_y))
+
+#     def wheelEvent(self, event):
+#         delta = event.angleDelta().y() / 120
+#         self.zoom *= 1.1**delta
+
 
 class MyMainWindow(QMainWindow):
     def __init__(self):
@@ -152,6 +268,7 @@ class MyMainWindow(QMainWindow):
         central_widget = QSplitter(self)
         self.setCentralWidget(central_widget)
 
+        #self.opengl_widget = MyMatplotlibWidget()
         self.opengl_widget = MyOpenGLWidget()
         central_widget.addWidget(self.opengl_widget)
 
