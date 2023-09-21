@@ -7,6 +7,7 @@ from PyQt5.QtCore import QTimer
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
+import numpy as np
 
 
 class MyOpenGLWidget(QGLWidget):
@@ -23,6 +24,7 @@ class MyOpenGLWidget(QGLWidget):
         self.max_rot_y = 90
         self.min_rot_y = -90
         self.function_choice = "..."
+        self.divisor = 1.0
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.updateGL)
         self.timer.start(16)
@@ -101,7 +103,16 @@ class MyOpenGLWidget(QGLWidget):
             for x in np.arange(0, 5, 0.1):
                 for y in np.arange(0, 5, 0.1):
                     z = y
-                    glVertex3f(x, y, z)
+                    glVertex3f(x, y, z / self.divisor)
+            glEnd()
+
+        if self.function_choice == "Функция Букина":
+            glColor3f(0.0, 0.0, 1.0)
+            glBegin(GL_POINTS)
+            for x in np.arange(-5, 5, 0.1):
+                for y in np.arange(-5, 5, 0.1):
+                    z = 100 * np.sqrt(abs(y - 0.01 * x**2)) + 0.01 * abs(x + 10)
+                    glVertex3f(x, y, z / 100)
             glEnd()
 
         glFlush()
@@ -202,7 +213,7 @@ class MyMainWindow(QMainWindow):
 
         tab2_layout = QVBoxLayout()
 
-        tab2_txt = QLabel("Некст говно")
+        tab2_txt = QLabel("Некст")
         tab2_layout.addWidget(tab2_txt)
 
         tab2.setLayout(tab2_layout)
@@ -254,8 +265,10 @@ class MyMainWindow(QMainWindow):
         group_layout.addRow(yInter_label, yInter_input)
 
         zScale = QLabel("Z масштаб:")
-        zScale_input = QLineEdit("1")
-        group_layout.addRow(zScale, zScale_input)
+        self.zScale_input = QLineEdit("1")
+        group_layout.addRow(zScale, self.zScale_input)
+
+        self.zScale_input.textChanged.connect(self.updateZ)
 
         axes = QLabel("Оси")
         axes_check = QCheckBox()
@@ -288,9 +301,16 @@ class MyMainWindow(QMainWindow):
 
         right_widget.setLayout(layout)
 
-    def handleComboBoxChange(self, index):
+    def handleComboBoxChange(self):
         selected_text = self.combo_box.currentText()
         self.opengl_widget.setFunctionChoice(selected_text)
+
+    def updateZ(self, text):
+        text = self.zScale_input.text()
+        try:
+            self.divisor = float(text)
+        except ValueError:
+            self.divisor = 1.0
 
 
 if __name__ == "__main__":
