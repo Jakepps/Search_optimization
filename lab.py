@@ -12,6 +12,42 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenuBar, QMenu, QSlider, QVBoxLayout, QWidget, QComboBox
+import time
+import asyncio
+import lr1 as lr1
+
+
+
+def function_himmelblau(x, y):
+    z = (x ** 2 + y - 11) ** 2 + (x + y ** 2 - 7) ** 2
+    return z
+
+
+def function_bukin(x, y):
+    z = 100 * np.sqrt(abs(y - 0.01 * x**2)) + 0.01 * abs(x + 10)
+    return z
+
+
+def function_rosenbrock(x, y):
+    z = (1 - x) ** 2 + 100 * (y - x ** 2) ** 2
+    return z
+
+
+def function_sphere(x, y):
+    r = 5
+    z = np.sqrt(r**2 - x**2 - y**2) if x**2 + y**2 <= r**2 else 0
+    return z
+
+
+def function_rastrigin(x, y):
+    A = 10
+    z = A + x**2 - A * np.cos(2 * np.pi * x) + y**2 - A * np.cos(2 * np.pi * y)
+    return z
+
+
+def function_z_y(x, y):
+    z = y
+    return z
 
 
 class MyOpenGLWidget(QGLWidget):
@@ -33,6 +69,8 @@ class MyOpenGLWidget(QGLWidget):
         self.timer.timeout.connect(self.updateGL)
         self.timer.start(16)
 
+        self.currentPoint = None
+
     def initializeGL(self):
         glClearColor(0.0, 0.0, 0.0, 1.0)
         glEnable(GL_DEPTH_TEST)
@@ -44,8 +82,14 @@ class MyOpenGLWidget(QGLWidget):
         gluPerspective(45, w / h, 0.1, 50.0)
         glMatrixMode(GL_MODELVIEW)
 
+    def paintPoint(self, x, y):
+        self.currentPoint = (x, y)
+
+        
     def paintGL(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+        
 
         glLoadIdentity()
         gluLookAt(5, 5, 10, 0, 0, 0, 0, 0, 5)
@@ -90,6 +134,15 @@ class MyOpenGLWidget(QGLWidget):
             glVertex3f(5, i, 0)
         glEnd()
 
+        if self.currentPoint is not None:
+            glPointSize(4)    
+            glColor3f(1.0, 0.0, 0.0)
+            glBegin(GL_POINTS)
+            glVertex3f(self.currentPoint[0], self.currentPoint[1], self.current_function(self.currentPoint[0], self.currentPoint[1]))
+            glEnd()
+            glPointSize(1)
+        
+
 
         # Отрисовка графика функции Химмельблау
         if self.function_choice == "Функция Химмельблау":
@@ -97,7 +150,8 @@ class MyOpenGLWidget(QGLWidget):
             glBegin(GL_POINTS)
             for x in np.arange(-5, 5, 0.1):
                 for y in np.arange(-5, 5, 0.1):
-                    z = (x ** 2 + y - 11) ** 2 + (x + y ** 2 - 7) ** 2
+                    # z = (x ** 2 + y - 11) ** 2 + (x + y ** 2 - 7) ** 2
+                    z = self.current_function(x, y)
                     glVertex3f(x, y, z / 100)
             glEnd()
 
@@ -106,7 +160,8 @@ class MyOpenGLWidget(QGLWidget):
             glBegin(GL_POINTS)
             for x in np.arange(0, 5, 0.1):
                 for y in np.arange(0, 5, 0.1):
-                    z = y
+                    # z = y
+                    z = self.current_function(x, y)
                     glVertex3f(x, y, z / self.divisor)
             glEnd()
 
@@ -115,7 +170,8 @@ class MyOpenGLWidget(QGLWidget):
             glBegin(GL_POINTS)
             for x in np.arange(-5, 5, 0.1):
                 for y in np.arange(-5, 5, 0.1):
-                    z = 100 * np.sqrt(abs(y - 0.01 * x**2)) + 0.01 * abs(x + 10)
+                    # z = 100 * np.sqrt(abs(y - 0.01 * x**2)) + 0.01 * abs(x + 10)
+                    z = self.current_function(x, y)
                     glVertex3f(x, y, z / 100)
             glEnd()
 
@@ -124,7 +180,8 @@ class MyOpenGLWidget(QGLWidget):
             glBegin(GL_POINTS)
             for x in np.arange(-5, 5, 0.1):
                 for y in np.arange(-5, 5, 0.1):
-                    z = (1 - x) ** 2 + 100 * (y - x ** 2) ** 2
+                    # z = (1 - x) ** 2 + 100 * (y - x ** 2) ** 2
+                    z = self.current_function(x, y)
                     glVertex3f(x, y, z / 10000)
             glEnd()
 
@@ -134,7 +191,8 @@ class MyOpenGLWidget(QGLWidget):
             glBegin(GL_POINTS)
             for x in np.arange(-r, r, 0.1):
                 for y in np.arange(-r, r, 0.1):
-                    z = np.sqrt(r**2 - x**2 - y**2) if x**2 + y**2 <= r**2 else 0
+                    # z = np.sqrt(r**2 - x**2 - y**2) if x**2 + y**2 <= r**2 else 0
+                    z = self.current_function(x, y)
                     glVertex3f(x, y, z)
             glEnd()
 
@@ -144,15 +202,17 @@ class MyOpenGLWidget(QGLWidget):
             glBegin(GL_POINTS)
             for x in np.arange(-5.12, 5.12, 0.1):
                 for y in np.arange(-5.12, 5.12, 0.1):
-                    z = A + x**2 - A * np.cos(2 * np.pi * x) + y**2 - A * np.cos(2 * np.pi * y)
+                    # z = A + x**2 - A * np.cos(2 * np.pi * x) + y**2 - A * np.cos(2 * np.pi * y)
+                    z = self.current_function(x, y)
                     glVertex3f(x, y, z / 10)
             glEnd()
 
 
         glFlush()
 
-    def setFunctionChoice(self, choice):
-        self.function_choice = choice
+    def setFunctionChoice(self, function_text, function):
+        self.function_choice = function_text
+        self.current_function = function
         self.updateGL()
 
     def mousePressEvent(self, event):
@@ -174,88 +234,6 @@ class MyOpenGLWidget(QGLWidget):
     def wheelEvent(self, event):
         delta = event.angleDelta().y() / 120
         self.zoom *= 1.1**delta
-
-# class MyMatplotlibWidget(QWidget):
-#     def __init__(self):
-#         super().__init__()
-
-#         self.rot_x = 0
-#         self.rot_y = 0
-#         self.zoom = 1.0
-#         self.last_x = 0
-#         self.last_y = 0
-#         self.max_rot_x = 90
-#         self.min_rot_x = -90
-#         self.max_rot_y = 90
-#         self.min_rot_y = -90
-#         self.function_choice = "..."
-#         self.divisor = 1.0
-
-#         self.canvas = FigureCanvas(Figure(figsize=(5, 5)))
-#         self.layout = QVBoxLayout()
-#         self.layout.addWidget(self.canvas)
-#         self.setLayout(self.layout)
-
-#         self.ax = self.canvas.figure.add_subplot(111, projection='3d')
-#         self.ax.set_xlabel('X')
-#         self.ax.set_ylabel('Y')
-#         self.ax.set_zlabel('Z')
-
-#         self.timer = QTimer(self)
-#         self.timer.timeout.connect(self.update_plot)
-#         self.timer.start(16)
-
-#     def update_plot(self):
-#         self.ax.clear()
-
-#         self.ax.view_init(elev=self.rot_x, azim=self.rot_y)
-#         self.ax.dist = 5 / self.zoom
-
-#         #if self.function_choice == "Функция Химмельблау":
-#         x = np.arange(-5, 5, 0.1)
-#         y = np.arange(-5, 5, 0.1)
-#         X, Y = np.meshgrid(x, y)
-#         Z = (X**2 + Y - 11)**2 + (X + Y**2 - 7)**2
-#         self.ax.plot_surface(X, Y, Z / 100, cmap='viridis')
-
-#         if self.function_choice == "Z = Y":
-#             x = np.arange(0, 5, 0.1)
-#             y = np.arange(0, 5, 0.1)
-#             X, Y = np.meshgrid(x, y)
-#             Z = Y
-#             self.ax.plot_surface(X, Y, Z / self.divisor, cmap='viridis')
-
-#         if self.function_choice == "Функция Букина":
-#             x = np.arange(-5, 5, 0.1)
-#             y = np.arange(-5, 5, 0.1)
-#             X, Y = np.meshgrid(x, y)
-#             Z = 100 * np.sqrt(np.abs(Y - 0.01 * X**2)) + 0.01 * np.abs(X + 10)
-#             self.ax.plot_surface(X, Y, Z / 100, cmap='viridis')
-
-#         self.canvas.draw()
-
-#     def set_function_choice(self, choice):
-#         self.function_choice = choice
-
-#     def mousePressEvent(self, event):
-#         self.last_x = event.x()
-#         self.last_y = event.y()
-
-#     def mouseMoveEvent(self, event):
-#         dx = event.x() - self.last_x
-#         dy = event.y() - self.last_y
-#         self.last_x = event.x()
-#         self.last_y = event.y()
-
-#         self.rot_x += dy
-#         self.rot_y += dx
-
-#         self.rot_x = max(self.min_rot_x, min(self.max_rot_x, self.rot_x))
-#         self.rot_y = max(self.min_rot_y, min(self.max_rot_y, self.rot_y))
-
-#     def wheelEvent(self, event):
-#         delta = event.angleDelta().y() / 120
-#         self.zoom *= 1.1**delta
 
 
 class MyMainWindow(QMainWindow):
@@ -320,6 +298,7 @@ class MyMainWindow(QMainWindow):
         settings_layout.addRow(delay, delay_input)
 
         button = QPushButton("Выполнить")
+        button.clicked.connect(self.gradient_descent)
         settings_layout.addWidget(button)
 
         tab1.setLayout(settings_layout)
@@ -418,9 +397,29 @@ class MyMainWindow(QMainWindow):
 
         right_widget.setLayout(layout)
 
+        self.handleComboBoxChange()
+
     def handleComboBoxChange(self):
         selected_text = self.combo_box.currentText()
-        self.opengl_widget.setFunctionChoice(selected_text)
+
+        match selected_text:
+            case "Функция Химмельблау":
+                self.current_function = function_himmelblau
+            case "Функция Букина":
+                self.current_function = function_bukin
+            case "Функция Розенброкка":
+                self.current_function = function_rosenbrock
+            case "Функция сферы":
+                self.current_function = function_sphere
+            case "Функция Растригина":
+                self.current_function = function_rastrigin
+            case "Z = Y":
+                self.current_function = function_z_y
+            case _:
+                self.current_function = function_z_y
+
+        self.opengl_widget.setFunctionChoice(selected_text, self.current_function)
+        
 
     def updateZ(self, text):
         text = self.zScale_input.text()
@@ -429,9 +428,32 @@ class MyMainWindow(QMainWindow):
         except ValueError:
             self.divisor = 1.0
 
+    
+
+    def gradient_descent(self):
+        # delay for iteration
+        delay = 0.5
+        # initial point
+        x0 = -1
+        y0 = -1
+        # initial step
+        tk = 0.5
+        # max iterations
+        M = 100
+
+        for x, y, k, f in lr1.gradient_descent(self.current_function, x0, y0, tk, M):
+            self.opengl_widget.paintPoint(x, y)
+            time.sleep(delay)
+            
+            print(f"({x}, {y}) {k} {f}")
+           
+    
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MyMainWindow()
     window.show()
     sys.exit(app.exec_())
+
+
