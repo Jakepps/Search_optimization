@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 from Gradient import make_data_lab_1, funct_consider
 from SLSQP import make_data_lab_2, kp
-from Rosenbrock_function import make_data_lab_3, rosenbrock_2
+from Rosenbrock_function import make_data_lab_3
 from genetic_algorithm_l3 import GeneticAlgorithmL3
 from functions import *
 
