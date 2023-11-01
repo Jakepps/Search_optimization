@@ -11,7 +11,7 @@ from Gradient import make_data_lab_1, funct_consider
 from SLSQP import make_data_lab_2, kp
 from Rosenbrock_function import make_data_lab_3
 from genetic_algorithm_l3 import GeneticAlgorithmL3
-from psa import PSA
+from pso import PSO
 from functions import *
 
 
@@ -407,7 +407,7 @@ def main():
         ax.plot_surface(x, y, z, rstride=5, cstride=5, alpha=0.5, cmap="inferno")
         canvas.draw()
 
-        psa_obj = PSA(rosenbrock_2, particle_number, 5.0, 5.0, fi_p, fi_g)
+        psa_obj = PSO(rosenbrock_2, particle_number, 5.0, 5.0, fi_p, fi_g)
 
         for particle in psa_obj.particles:
             ax.scatter(particle[0], particle[1], particle[2], c="black", s=1, marker="s")

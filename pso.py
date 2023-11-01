@@ -3,7 +3,7 @@ import numpy as np
 from operator import itemgetter
 
 
-class PSA:
+class PSO:
     def __init__(self, func, population, position_x, position_y, fi_p, fi_g):
         self.func = func
         self.population = population
@@ -51,7 +51,7 @@ class PSA:
                 self.nostalgia[i] = self.particles[i]
                 point_best = self.particles[i]
 
-            self.velocity[i] = PSA.update_velocity(self, self.velocity[i], self.particles[i], point_best)
-            self.particles[i] = PSA.update_position(self, self.velocity[i], self.particles[i])
+            self.velocity[i] = PSO.update_velocity(self, self.velocity[i], self.particles[i], point_best)
+            self.particles[i] = PSO.update_position(self, self.velocity[i], self.particles[i])
 
         self.generation_best = min(self.particles, key=itemgetter(2))
