@@ -395,7 +395,10 @@ def main():
     def draw_lab_4():
         fig.clf()
 
-        x, y, z = make_data_lab_3()
+        #x, y, z = make_data_lab_3()
+        px = 5.0
+        py = 5.0
+        x, y, z = make_data_rastrigin(px, py)
 
         iter_number = int(txt_1_tab_4.get())
         particle_number = int(txt_2_tab_4.get())
@@ -407,7 +410,7 @@ def main():
         ax.plot_surface(x, y, z, rstride=5, cstride=5, alpha=0.5, cmap="inferno")
         canvas.draw()
 
-        psa_obj = PSO(rosenbrock_2, particle_number, 5.0, 5.0, fi_p, fi_g)
+        psa_obj = PSO(rastrigin_2, particle_number, px, py, fi_p, fi_g)
 
         for particle in psa_obj.particles:
             ax.scatter(particle[0], particle[1], particle[2], c="black", s=1, marker="s")
@@ -471,7 +474,7 @@ def main():
     lbl_2_tab_4 = Label(left_f_tab_4, text="Количество частиц")
     lbl_4_tab_4 = Label(left_f_tab_4, text="Коэффициент g")
     lbl_5_tab_4 = Label(left_f_tab_4, text="Задержка в секундах")
-    lbl_6_tab_4 = Label(tab_4, text="Функция Розенброка")
+    lbl_6_tab_4 = Label(tab_4, text="Функция Растригина")
     lbl_7_tab_4 = Label(left_f_tab_4, text="Коэффициент p")
 
     txt_1_tab_4 = Entry(right_f_tab_4)
