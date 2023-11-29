@@ -14,6 +14,7 @@ from genetic_algorithm_l3 import GeneticAlgorithmL3
 from pso import PSO
 from bees import Bees
 from immune import Immunity
+from bacterias import Bacteria
 from functions import *
 
 
@@ -873,6 +874,155 @@ def main():
     txt_f_tab_6.pack(side=BOTTOM, padx=5, pady=5, fill=BOTH, expand=True)
     btn_del_tab_6.pack(side=BOTTOM, padx=5, pady=5, fill=BOTH, expand=True)
 
+    # Лаба 7
+
+    def draw_lab_7():
+        fig.clf()
+
+        iter_number = int(txt_1_tab_7.get())
+        population = int(txt_2_tab_7.get())
+        xemotaxis = int(txt_3_tab_7.get())
+        licvid = float(txt_4_tab_7.get())
+        pos_x = int(txt_5_tab_7.get())
+        pos_y = int(txt_6_tab_7.get())
+        delay = txt_7_tab_7.get()
+
+        if combo_tab_7.get() == "Химмельблау":
+            func = himmelblau_2
+            x, y, z = make_data_himmelblau(pos_x, pos_y)
+        elif combo_tab_7.get() == "Розенброка":
+            func = rosenbrock_2
+            x, y, z = make_data_rosenbrock(pos_x, pos_y)
+        else:
+            func = rastrigin_2
+            x, y, z = make_data_rastrigin(pos_x, pos_y)
+
+        ax = fig.add_subplot(projection='3d')
+        ax.plot_surface(x, y, z, rstride=5, cstride=5, alpha=0.5, cmap="inferno")
+        canvas.draw()
+
+        bacterias = Bacteria(func, population, xemotaxis, licvid, pos_x, pos_y)
+
+        for i in range(iter_number):
+
+            bacterias.chemotaxis(1 / (i + 1))
+            bacterias.reproduction()
+            bacterias.elimnination()
+
+            for bac in bacterias.agents:
+                ax.scatter(bac[0], bac[1], bac[2], c="black", s=1, marker="s")
+
+            b = bacterias.get_best()
+            ax.scatter(b[0], b[1], b[2], c="red")
+
+            txt_tab_7.insert(INSERT,
+                             f"{i + 1}) ({round(b[0], 6)})"
+                             f" ({round(b[1], 6)}) = "
+                             f" ({round(b[2], 6)})"
+                             f" H=({round(b[3], 2)})\n")
+
+            canvas.draw()
+            window.update()
+            time.sleep(float(delay))
+
+            fig.clf()
+            ax = fig.add_subplot(projection='3d')
+            ax.plot_surface(x, y, z, rstride=5, cstride=5, alpha=0.5, cmap="inferno")
+            canvas.draw()
+
+        for bac in bacterias.agents:
+            ax.scatter(bac[0], bac[1], bac[2], c="black", s=1, marker="s")
+
+        b = bacterias.get_best()
+        ax.scatter(b[0], b[1], b[2], c="red")
+
+        txt_tab_7.insert(INSERT,
+                         f"{i + 1}) ({round(b[0], 6)})"
+                         f" ({round(b[1], 6)}) = "
+                         f" ({round(b[2], 6)})"
+                         f"H=({round(b[3], 2)})\n")
+
+        canvas.draw()
+        window.update()
+
+        canvas.draw()
+        window.update()
+
+        messagebox.showinfo('Уведомление', 'Готово')
+
+    def delete_lab_7():
+        txt_tab_7.delete(1.0, END)
+
+    tab_7 = Frame(tab_control)
+    tab_control.add(tab_7, text="LR7")
+
+    main_f_tab_7 = LabelFrame(tab_7, text="Параметры")
+    left_f_tab_7 = Frame(main_f_tab_7)
+    right_f_tab_7 = Frame(main_f_tab_7)
+    txt_f_tab_7 = LabelFrame(tab_7, text="Выполнение и результаты")
+
+    lbl_1_tab_7 = Label(left_f_tab_7, text="Кол-во итераций")
+    lbl_2_tab_7 = Label(left_f_tab_7, text="Размер популяции")
+    lbl_3_tab_7 = Label(left_f_tab_7, text="Шаги хемотаксиса")
+    lbl_4_tab_7 = Label(left_f_tab_7, text=" Вероятность ликвидации")
+    lbl_5_tab_7 = Label(left_f_tab_7, text="Задержка в секундах")
+    lbl_6_tab_7 = Label(tab_7, text="Бактериальная оптимизация")
+    lbl_7_tab_7 = Label(left_f_tab_7, text="X")
+    lbl_8_tab_7 = Label(left_f_tab_7, text="Y")
+    lbl_9_tab_7 = Label(left_f_tab_7, text="Выбор")
+
+    txt_1_tab_7 = Entry(right_f_tab_7)
+    txt_1_tab_7.insert(0, "100")
+    txt_2_tab_7 = Entry(right_f_tab_7)
+    txt_2_tab_7.insert(0, "40")
+    txt_3_tab_7 = Entry(right_f_tab_7)
+    txt_3_tab_7.insert(0, "6")
+    txt_4_tab_7 = Entry(right_f_tab_7)
+    txt_4_tab_7.insert(0, "15")
+    txt_5_tab_7 = Entry(right_f_tab_7)
+    txt_5_tab_7.insert(0, "12")
+    txt_6_tab_7 = Entry(right_f_tab_7)
+    txt_6_tab_7.insert(0, "12")
+    txt_7_tab_7 = Entry(right_f_tab_7)
+    txt_7_tab_7.insert(0, "0.5")
+
+    combo_tab_7 = Combobox(right_f_tab_7)
+    combo_tab_7['values'] = ("Химмельблау", "Розенброка")
+    combo_tab_7.set("Химмельблау")
+
+    txt_tab_7 = scrolledtext.ScrolledText(txt_f_tab_7)
+    btn_del_tab_7 = Button(tab_7, text="Очистить", command=delete_lab_7)
+    btn_tab_7 = Button(tab_7, text="Выполнить", foreground="black", background="#199917", command=draw_lab_7)
+
+    lbl_6_tab_7.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    main_f_tab_7.pack(side=TOP, padx=5, pady=5, fill=BOTH, expand=True)
+    left_f_tab_7.pack(side=LEFT, fill=BOTH, expand=True)
+    right_f_tab_7.pack(side=RIGHT, fill=BOTH, expand=True)
+
+    lbl_1_tab_7.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    lbl_2_tab_7.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    lbl_3_tab_7.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    lbl_4_tab_7.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    lbl_7_tab_7.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    lbl_8_tab_7.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    lbl_5_tab_7.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    lbl_9_tab_7.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+
+    txt_1_tab_7.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    txt_2_tab_7.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    txt_3_tab_7.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    txt_4_tab_7.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    txt_5_tab_7.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    txt_6_tab_7.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    txt_7_tab_7.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+
+    combo_tab_7.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+
+    txt_tab_7.pack(padx=5, pady=5, fill=BOTH, expand=True)
+
+    btn_tab_7.pack(side=BOTTOM, padx=5, pady=5, fill=BOTH, expand=True)
+    txt_f_tab_7.pack(side=BOTTOM, padx=5, pady=5, fill=BOTH, expand=True)
+    btn_del_tab_7.pack(side=BOTTOM, padx=5, pady=5, fill=BOTH, expand=True)
 
     tab_control.pack(side=RIGHT, fill=BOTH, expand=True)
     window.mainloop()
