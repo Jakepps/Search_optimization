@@ -13,6 +13,7 @@ from Rosenbrock_function import make_data_lab_3
 from genetic_algorithm_l3 import GeneticAlgorithmL3
 from pso import PSO
 from bees import Bees
+from immune import Immunity
 from functions import *
 
 
@@ -516,7 +517,7 @@ def main():
     txt_f_tab_4.pack(side=BOTTOM, padx=5, pady=5, fill=BOTH, expand=True)
     btn_del_tab_4.pack(side=BOTTOM, padx=5, pady=5, fill=BOTH, expand=True)
 
- # Лаба 5
+    # Лаба 5
 
     def draw_lab_5():
         fig.clf()
@@ -712,6 +713,166 @@ def main():
     btn_tab_5.pack(side=BOTTOM, padx=5, pady=5, fill=BOTH, expand=True)
     txt_f_tab_5.pack(side=BOTTOM, padx=5, pady=5, fill=BOTH, expand=True)
     btn_del_tab_5.pack(side=BOTTOM, padx=5, pady=5, fill=BOTH, expand=True)
+
+    # Лаба 6
+
+    def draw_lab_6():
+        fig.clf()
+
+        pop_number = int(txt_2_tab_6.get())
+        iter_number = int(txt_1_tab_6.get())
+        clon = int(txt_3_tab_6.get())
+        best_clon = int(txt_5_tab_6.get())
+        best_pop = int(txt_4_tab_6.get())
+        pos_x = int(txt_6_tab_6.get())
+        pos_y = int(txt_7_tab_6.get())
+        delay = txt_8_tab_6.get()
+
+        if combo_tab_6.get() == "Химмельблау":
+            func = himmelblau_2
+            x, y, z = make_data_himmelblau(pos_x, pos_y)
+        else:
+            func = rosenbrock_2
+            x, y, z = make_data_rosenbrock(pos_x, pos_y)
+
+        ax = fig.add_subplot(projection='3d')
+        ax.plot_surface(x, y, z, rstride=5, cstride=5, alpha=0.5, cmap="inferno")
+        canvas.draw()
+
+        immunity = Immunity(func, pop_number, clon, best_pop, best_clon, pos_x, pos_y)
+
+        for ag in immunity.agents:
+            ax.scatter(ag[0], ag[1], ag[2], c="black", s=1, marker="s")
+
+        b = immunity.get_best()
+        ax.scatter(b[0], b[1], b[2], c="red")
+
+        canvas.draw()
+        window.update()
+
+        fig.clf()
+        ax = fig.add_subplot(projection='3d')
+        ax.plot_surface(x, y, z, rstride=5, cstride=5, alpha=0.5, cmap="inferno")
+        canvas.draw()
+
+        for i in range(iter_number):
+            immunity.immune_step(1 / (i + 1))
+
+            for ag in immunity.agents:
+                ax.scatter(ag[0], ag[1], ag[2], c="black", s=1, marker="s")
+
+            b = immunity.get_best()
+            ax.scatter(b[0], b[1], b[2], c="red")
+
+            txt_tab_6.insert(INSERT,
+                             f"{i + 1}) ({round(b[0], 8)})"
+                             f" ({round(b[1], 8)}) = "
+                             f" ({round(b[2], 8)})\n")
+
+            canvas.draw()
+            window.update()
+            time.sleep(float(delay))
+
+            fig.clf()
+            ax = fig.add_subplot(projection='3d')
+            ax.plot_surface(x, y, z, rstride=5, cstride=5, alpha=0.5, cmap="inferno")
+            canvas.draw()
+
+        for ag in immunity.agents:
+            ax.scatter(ag[0], ag[1], ag[2], c="black", s=1, marker="s")
+
+        b = immunity.get_best()
+        ax.scatter(b[0], b[1], b[2], c="red")
+
+        txt_tab_6.insert(INSERT,
+                         f"{i + 1}) ({round(b[0], 8)})"
+                         f" ({round(b[1], 8)}) = "
+                         f" ({round(b[2], 8)})\n")
+
+        canvas.draw()
+        window.update()
+
+        messagebox.showinfo('Уведомление', 'Готово')
+
+    def delete_lab_6():
+        txt_tab_6.delete(1.0, END)
+
+    tab_6 = Frame(tab_control)
+    tab_control.add(tab_6, text="LR6")
+
+    main_f_tab_6 = LabelFrame(tab_6, text="Параметры")
+    left_f_tab_6 = Frame(main_f_tab_6)
+    right_f_tab_6 = Frame(main_f_tab_6)
+    txt_f_tab_6 = LabelFrame(tab_6, text="Выполнение и результаты")
+
+    lbl_1_tab_6 = Label(left_f_tab_6, text="Кол-во итераций")
+    lbl_2_tab_6 = Label(left_f_tab_6, text="Размер популяции")
+    lbl_3_tab_6 = Label(left_f_tab_6, text="Кол-во клонов")
+    lbl_4_tab_6 = Label(left_f_tab_6, text="Кол-во лучших решений из клонов")
+    lbl_5_tab_6 = Label(left_f_tab_6, text="Задержка в секундах")
+    lbl_6_tab_6 = Label(tab_6, text="Иммунная сеть")
+    lbl_7_tab_6 = Label(left_f_tab_6, text="Кол-во лучших решений из популяции")
+    lbl_8_tab_6 = Label(left_f_tab_6, text="X")
+    lbl_9_tab_6 = Label(left_f_tab_6, text="Y")
+    lbl_10_tab_6 = Label(left_f_tab_6, text="Выбор")
+
+    txt_1_tab_6 = Entry(right_f_tab_6)
+    txt_1_tab_6.insert(0, "200")
+    txt_2_tab_6 = Entry(right_f_tab_6)
+    txt_2_tab_6.insert(0, "50")
+    txt_3_tab_6 = Entry(right_f_tab_6)
+    txt_3_tab_6.insert(0, "20")
+    txt_4_tab_6 = Entry(right_f_tab_6)
+    txt_4_tab_6.insert(0, "10")
+    txt_5_tab_6 = Entry(right_f_tab_6)
+    txt_5_tab_6.insert(0, "10")
+    txt_6_tab_6 = Entry(right_f_tab_6)
+    txt_6_tab_6.insert(0, "12")
+    txt_7_tab_6 = Entry(right_f_tab_6)
+    txt_7_tab_6.insert(0, "12")
+    txt_8_tab_6 = Entry(right_f_tab_6)
+    txt_8_tab_6.insert(0, "0.5")
+
+    combo_tab_6 = Combobox(right_f_tab_6)
+    combo_tab_6['values'] = ("Химмельблау", "Розенброка")
+    combo_tab_6.set("Химмельблау")
+
+
+    txt_tab_6 = scrolledtext.ScrolledText(txt_f_tab_6)
+    btn_del_tab_6 = Button(tab_6, text="Очистить", command=delete_lab_6)
+    btn_tab_6 = Button(tab_6, text="Выполнить", foreground="black", background="#199917", command=draw_lab_6)
+
+    lbl_6_tab_6.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    main_f_tab_6.pack(side=TOP, padx=5, pady=5, fill=BOTH, expand=True)
+    left_f_tab_6.pack(side=LEFT, fill=BOTH, expand=True)
+    right_f_tab_6.pack(side=RIGHT, fill=BOTH, expand=True)
+
+    lbl_1_tab_6.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    lbl_2_tab_6.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    lbl_3_tab_6.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    lbl_7_tab_6.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    lbl_4_tab_6.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    lbl_8_tab_6.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    lbl_9_tab_6.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    lbl_5_tab_6.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    lbl_10_tab_6.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+
+    txt_1_tab_6.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    txt_2_tab_6.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    txt_3_tab_6.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    txt_4_tab_6.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    txt_5_tab_6.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    txt_6_tab_6.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    txt_7_tab_6.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    txt_8_tab_6.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+    combo_tab_6.pack(side=TOP, padx=5, pady=5, fill=BOTH)
+
+    txt_tab_6.pack(padx=5, pady=5, fill=BOTH, expand=True)
+
+    btn_tab_6.pack(side=BOTTOM, padx=5, pady=5, fill=BOTH, expand=True)
+    txt_f_tab_6.pack(side=BOTTOM, padx=5, pady=5, fill=BOTH, expand=True)
+    btn_del_tab_6.pack(side=BOTTOM, padx=5, pady=5, fill=BOTH, expand=True)
+
 
     tab_control.pack(side=RIGHT, fill=BOTH, expand=True)
     window.mainloop()
