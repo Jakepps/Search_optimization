@@ -890,12 +890,9 @@ def main():
         if combo_tab_7.get() == "Химмельблау":
             func = himmelblau_2
             x, y, z = make_data_himmelblau(pos_x, pos_y)
-        elif combo_tab_7.get() == "Розенброка":
+        else:
             func = rosenbrock_2
             x, y, z = make_data_rosenbrock(pos_x, pos_y)
-        else:
-            func = rastrigin_2
-            x, y, z = make_data_rastrigin(pos_x, pos_y)
 
         ax = fig.add_subplot(projection='3d')
         ax.plot_surface(x, y, z, rstride=5, cstride=5, alpha=0.5, cmap="inferno")
@@ -918,8 +915,8 @@ def main():
             txt_tab_7.insert(INSERT,
                              f"{i + 1}) ({round(b[0], 6)})"
                              f" ({round(b[1], 6)}) = "
-                             f" ({round(b[2], 6)})"
-                             f" H=({round(b[3], 2)})\n")
+                             f" ({round(b[2], 6)});"
+                             f" Health=({round(b[3], 2)})\n")
 
             canvas.draw()
             window.update()
@@ -939,8 +936,8 @@ def main():
         txt_tab_7.insert(INSERT,
                          f"{i + 1}) ({round(b[0], 6)})"
                          f" ({round(b[1], 6)}) = "
-                         f" ({round(b[2], 6)})"
-                         f"H=({round(b[3], 2)})\n")
+                         f" ({round(b[2], 6)});"
+                         f"Health=({round(b[3], 2)})\n")
 
         canvas.draw()
         window.update()
